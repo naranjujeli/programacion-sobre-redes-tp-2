@@ -31,6 +31,9 @@ int main(int argc , char* argv[]){
         plain(primera_imagen, (unsigned char)primer_parametro);
     } else if (filtro == "blackwhite") {
         blackWhite(primera_imagen);
+    } else if (filtro == "shades") {
+        // TODO Verificar que el primer parámetro no es menor a 2
+        shades(primera_imagen, primer_parametro);
     }
 
     cout << "Escribiendo imagen" << endl;
