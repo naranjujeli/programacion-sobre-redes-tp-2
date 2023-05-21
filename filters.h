@@ -1,13 +1,7 @@
+#include "ppm.h"
+
 #ifndef FILTERS_H
 #define FILTERS_H
-
-#include <iostream>
-#include <string>
-#include <stdlib.h>
-#include <vector>
-#include "ppm.h"
-#include <atomic>
-
 
 // FILTROS SINGLE-THREAD
 

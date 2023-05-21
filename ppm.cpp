@@ -1,11 +1,8 @@
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <sstream>
-#include <exception>
-#include <vector>
-
+#include "stdafx.h"
 #include "ppm.h"
+
+#ifndef PPM_CPP
+#define PPM_CPP
 
 // Funcion auxiliar para truncar un pixel a valores entre 0 a 255
 unsigned char truncate_pixel(float color) { 
@@ -133,3 +130,5 @@ void ppm::write(const  string &fname) {
     }
     inp.close();
 }
+
+#endif
