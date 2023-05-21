@@ -33,7 +33,11 @@ int main(int argc , char* argv[]){
         blackWhite(primera_imagen);
     } else if (filtro == "shades") {
         // TODO Verificar que el primer parámetro no es menor a 2
-        shades(primera_imagen, primer_parametro);
+        shades(primera_imagen, (unsigned char)primer_parametro);
+    } else if (filtro == "brightness") {
+        // TODO Brightness
+    } else if (filtro == "contrast") {
+        contrast(primera_imagen, primer_parametro);
     }
 
     cout << "Escribiendo imagen" << endl;
