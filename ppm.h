@@ -5,68 +5,53 @@ using namespace std;
 
 
 struct Pixel{
+    short int rojo;
+    short int verde;
+    short int azul;
 
-    short int  r;
-    short int  g;
-    short int  b;
+    Pixel(short int rojo=0, short int verde=0, short int azul=0) : rojo(rojo), verde(verde), azul(azul) {}
 
-    // Constructor 
-    Pixel(unsigned short int r2=0, unsigned short int g2=0, unsigned short int b2 = 0) : r(r2), g(g2), b(b2) {}
+    Pixel& sumar(short int n) { rojo += n; verde += n; azul += n; return *this; }
 
-    Pixel& add(short int k){ r += k; g += k; b += k; return *this; }
+    Pixel& restar(short int n) { rojo -= n; verde -= n; azul -= n; return *this; }
 
-    Pixel& sub(short int k){ r -= k; g -= k; b -= k; return *this; }
+    Pixel& multiplicar(float n) { rojo *= n; verde *= n; azul *= n; return *this; }
 
-    Pixel& mult(float k){ r *= k; g *= k; b *= k; return *this; }
+    Pixel& sumarPixel(Pixel otro_pixel) { rojo += otro_pixel.rojo; verde += otro_pixel.verde; azul += otro_pixel.azul; return *this; }
 
-    Pixel& addp(Pixel p){ r += p.r; g += p.g; b += p.b; return *this; }
+    const short int sumaCumulativa() { return rojo + verde + azul; } 
 
-    short int cumsum(){ return r + g + b; } 
-
-    Pixel& truncate(){ 
-       r = (r > 255) ? 255 : ((r < 0) ? 0: (unsigned char)r); 
-       g = (g > 255) ? 255 : ((g < 0) ? 0: (unsigned char)g); 
-       b = (b > 255) ? 255 : ((b < 0) ? 0: (unsigned char)b);
+    Pixel& truncar() { 
+       rojo = (rojo > 255) ? 255 : ((rojo < 0) ? 0: rojo); 
+       verde = (verde > 255) ? 255 : ((verde < 0) ? 0: verde); 
+       azul = (azul > 255) ? 255 : ((azul < 0) ? 0: azul);
        return *this;
     }
 };
 
+class PPM {
+    private:
+        void inicializar(unsigned int ancho, unsigned int alto);
 
-class ppm {
+        unsigned int cantidad_filas;
+        unsigned int cantidad_columnas;
+        std::vector<std::vector<Pixel>> bitmap;
 
-private:
+    public:
+        unsigned int ancho;
+        unsigned int alto;
+        unsigned int valor_maximo_colores;
+        unsigned int tamanio;
 
-    void init(int _width, int _height);
+        PPM();
+        PPM(const std::string &ruta);
+        PPM(unsigned int ancho, unsigned int alto);
 
-    unsigned int nr_lines;
-    unsigned int nr_columns;
-    vector<vector<Pixel>> bitmap;
+        void leer_imagen(const std::string &ruta);
+        void escribir_imagen(const std::string &ruta);
 
-public:
-    
-    unsigned int height;
-    unsigned int width;
-    unsigned int max_col_val;
-    unsigned int size;
-
-    ppm();
-
-    // Crea un objeto PPM y lo rellena con la info en fname
-    ppm(const std::string &fname);
-
-    // Crea un imagen vacia(con cero) con altura _height y ancho _width
-    ppm(int _width, int _height);
-
-    // Lee la imagen PPM de fname
-    void read(const std::string &fname);
-
-    // Escribe la imagen PPM de fname
-    void write(const std::string &fname);
-
-    void setPixel(int i, int j, Pixel p){ bitmap[i][j] = p; }
-  
-    Pixel getPixel(int i, int j){ return bitmap[i][j]; }
-
+        void setPixel(int i, int j, Pixel nuevo_valor) { bitmap[i][j] = nuevo_valor; }
+        Pixel getPixel(int i, int j) { return bitmap[i][j]; }
 };
 
 #endif

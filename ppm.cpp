@@ -4,131 +4,130 @@
 #ifndef PPM_CPP
 #define PPM_CPP
 
-// Funcion auxiliar para truncar un pixel a valores entre 0 a 255
-unsigned char truncate_pixel(float color) { 
-    return (color > 255) ? 255 : ((color < 0) ? 0: (unsigned char)color); 
+unsigned short int truncarValor(float valor) { 
+    if (valor > 255) {
+        return 255;
+    } else if (valor < 0) {
+        return 0;
+    }
+    return static_cast<unsigned short int>(valor);
 }
 
-// Init valores por defecto
-void ppm::init(int _width, int _height) {
-    width = _width;
-    height = _height;
-    max_col_val = 255;
-    size = _width*_height;
+void PPM::inicializar(unsigned int ancho, unsigned int alto) {
+    this->ancho = ancho;
+    this->alto = alto;
+    this->valor_maximo_colores = 255;
+    this->tamanio = ancho*alto;
 }
 
-// Crea el objeto PPM
-ppm::ppm() {
-    init(0, 0);
+PPM::PPM() {
+    inicializar(0, 0);
 }
 
-ppm::ppm(int _width, int _height){
-    init(_width,_height);
-    bitmap.resize(height);
-    for(unsigned int i = 0; i<height;i++)
-        bitmap[i].resize(width);
-
+PPM::PPM(unsigned int ancho, unsigned int alto){
+    inicializar(ancho, alto);
+    this->bitmap.resize(alto);
+    for (unsigned int i = 0; i < alto; i++) {
+        this->bitmap[i].resize(ancho);
+    }
 }
 
-// Crea un objeto PPM y lo inicializa con la info de fname
-ppm::ppm(const  string &fname) {
-    init(0,0);
-    read(fname);
+PPM::PPM(const std::string &ruta) {
+    inicializar(0,0);
+    leer_imagen(ruta);
 }
 
-
-// Lee la imagen PPM de fname
-void ppm::read(const  string &fname) {
-     ifstream inp(fname.c_str(),  ios::in |  ios::binary);
-    if (inp.is_open()) {
-        string line;
+void PPM::leer_imagen(const std::string &ruta) {
+    std::ifstream archivo_entrada(ruta.c_str(), ios::in | ios::binary);
+    if (archivo_entrada.is_open()) {
+        std::string linea;
         
-        // Obtiene el Header
-        getline(inp, line);
-        if (line != "P6") {
-             cout << "Error. Unrecognized file format." <<  endl;
+        // ¿El archivo empieza con "P6"? Es .ppm
+        getline(archivo_entrada, linea);
+        if (linea != "P6") {
+            cout << "Error. Unrecognized file format." <<  endl;
             return;
         }
 
-        // Ignora los comentarios
-        getline(inp, line);
-        while (line[0] == '#') {
-             getline(inp, line);
+        // Ignorar los comentarios
+        getline(archivo_entrada, linea);
+        while (linea[0] == '#') {
+             getline(archivo_entrada, linea);
         }
         
-        // Obtiene las dimensiones de la imagen
-        stringstream dimensions(line);
+        // Línea con ancho y alto de la imagen
+        stringstream dimensiones_imagen(linea);
         try {
-            dimensions >> width;
-            dimensions >> height;
-            nr_lines = height;
-            nr_columns = width;
-        } catch ( exception &e) {
+            dimensiones_imagen >> this->ancho;
+            dimensiones_imagen >> this->alto;
+            this->cantidad_filas = this->alto;
+            this->cantidad_columnas = this->ancho;
+        } catch (std::exception &e) {
              cout << "Header file format error. " << e.what() <<  endl;
             return;
         }
 
-        // Obtiene el maximo valor de color
-        getline(inp, line);
-        stringstream max_val(line);
+        // Obtener el valor máximo de cada pixel
+        getline(archivo_entrada, linea);
+        stringstream valor_maximo(linea);
         try {
-            max_val >> max_col_val;
-        } catch ( exception &e) {
-             cout << "Header file format error. " << e.what() <<  endl;
+            valor_maximo >> this->valor_maximo_colores;
+        } catch (std::exception &e) {
+            cout << "Header file format error. " << e.what() <<  endl;
             return;
         }
-        size = width*height;
 
-        // Inicializa la matriz que representa la imagen
-        bitmap.resize(height);
-        for(unsigned int i = 0; i<height;i++)
-            bitmap[i].resize(width);
+        this->tamanio = this->ancho*this->alto;
+
+        // Reasignar el tamaño de la matriz
+        this->bitmap.resize(this->alto);
+        for(unsigned int i = 0; i < this->alto; i++) {
+            this->bitmap[i].resize(this->ancho);
+        }
         
-        // Itera y escribe la informacion en la matriz
+        // Escribir la informacion en la matriz
         char aux;
-        for (unsigned int i = 0; i < size; ++i) {
-            inp.read(&aux, 1);
-            bitmap[i/width][i%width].r = (unsigned char)aux;
-            inp.read(&aux, 1);
-            bitmap[i/width][i%width].g = (unsigned char)aux;
-            inp.read(&aux, 1);
-            bitmap[i/width][i%width].b = (unsigned char)aux;
+        for (unsigned int i = 0; i < this->tamanio; ++i) {
+            archivo_entrada.read(&aux, 1);
+            this->bitmap[i/this->ancho][i%this->ancho].rojo = (unsigned char)aux;
+            archivo_entrada.read(&aux, 1);
+            this->bitmap[i/this->ancho][i%this->ancho].verde = (unsigned char)aux;
+            archivo_entrada.read(&aux, 1);
+            this->bitmap[i/this->ancho][i%this->ancho].azul = (unsigned char)aux;
         }
 
     } else {
-         cout << "Error. Unable to open " << fname <<  endl;
+         cout << "Error. Unable to open " << ruta <<  endl;
     }
-    inp.close();
+    archivo_entrada.close();
 }
 
-// Escribe la imagen PPM de fname
-void ppm::write(const  string &fname) {
-    ofstream inp(fname.c_str(), ios::out | ios::binary);
-    if (inp.is_open()) {
+void PPM::escribir_imagen(const  string &ruta) {
+    ofstream archivo_salida(ruta.c_str(), ios::out | ios::binary);
+    if (archivo_salida.is_open()) {
 
-        inp << "P6\n";
-        inp << width;
-        inp << " ";
-        inp << height << "\n";
-        inp << max_col_val << "\n";
+        archivo_salida << "P6" << std::endl;
+        archivo_salida << this->ancho;
+        archivo_salida << " ";
+        archivo_salida << this->alto << std::endl;
+        archivo_salida << this->valor_maximo_colores << std::endl;
 
         char aux;
-
-        for (unsigned int i = 0; i < height; ++i) {
-            for(unsigned int j = 0; j < width;j++){
-                aux = (char) bitmap[i][j].r;
-                inp.write(&aux, 1);
-                aux = (char) bitmap[i][j].g;
-                inp.write(&aux, 1);
-                aux = (char) bitmap[i][j].b;
-                inp.write(&aux, 1);
+        for (unsigned int i = 0; i < alto; ++i) {
+            for(unsigned int j = 0; j < ancho; j++){
+                aux = (char) this->bitmap[i][j].rojo;
+                archivo_salida.write(&aux, 1);
+                aux = (char) this->bitmap[i][j].verde;
+                archivo_salida.write(&aux, 1);
+                aux = (char) this->bitmap[i][j].azul;
+                archivo_salida.write(&aux, 1);
             }
         }
 
     } else {
-         cout << "Error. Unable to open " << fname <<  endl;
+        std::cout << "Error. Unable to open " << ruta << std::endl;
     }
-    inp.close();
+    archivo_salida.close();
 }
 
 #endif
