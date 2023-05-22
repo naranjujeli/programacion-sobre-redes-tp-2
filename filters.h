@@ -9,7 +9,7 @@ void blackWhite(PPM& imagen);
 void contrast(PPM& imagen, float contraste);
 void brightness(PPM& imagen, float brillo, int inicio, int fin);
 void shades(PPM& imagen, unsigned char cantidad_grises);
-void merge(PPM& primera_imagen, PPM& segunda_imagen, float alfa);
+void merge(PPM& primera_imagen, PPM& segunda_imagen, float alfa_primera_imagen);
 void frame(PPM& imagen, Pixel color, int x);
 void boxBlur(PPM &imagen);
 void zoom(PPM &imagen, PPM &imagen_aumentada, int n);

@@ -10,7 +10,7 @@ int main(int argc , char* argv[]){
     // Asumimos que los filtros sin p1 se escriben primero (por lo tanto, el primer p1 es no nulo)
     // Asumimos que Zoom no se puede encadenar
 
-    if(string(argv[1]) == "-help"){
+    if (string(argv[1]) == "-help") {
         cout << "Uso: ./main <filtro> <nthreads> <[p1]> <img1> <custom_output> <[p2]> <img2>" << endl;
         return 0; 
     }
@@ -18,12 +18,14 @@ int main(int argc , char* argv[]){
     // TODO Verificar que los argumentos sean correctos
     
     string filtro = string(argv[1]);
-    unsigned int cantidad_threads = atoi(argv[2]);
-    float primer_parametro = atof(argv[3]);
-    string ruta_primera_imagen = string(argv[4]);
-    string ruta_imagen_final = string(argv[5]);
     
+    unsigned int cantidad_threads = atoi(argv[2]);
+    
+    float primer_parametro = atof(argv[3]);
+
+    string ruta_primera_imagen = string(argv[4]);
     PPM primera_imagen(ruta_primera_imagen);
+    string ruta_imagen_final = string(argv[5]);    
     
     cout << "Aplicando filtros"<< endl;
 
@@ -35,9 +37,16 @@ int main(int argc , char* argv[]){
         // TODO Verificar que el primer parámetro no es menor a 2
         shades(primera_imagen, (unsigned char)primer_parametro);
     } else if (filtro == "brightness") {
-        // TODO Brightness
+        // TODO Averiguar qué significa inicio y fin
+        brightness(primera_imagen, primer_parametro, 0, 0);
     } else if (filtro == "contrast") {
+        // TODO Limitar el contraste
         contrast(primera_imagen, primer_parametro);
+    } else if (filtro == "merge") {
+        // TODO Limitar porcentaje
+        // TODO Verificar igual tamaño
+        PPM segunda_imagen(argv[7]);
+        merge(primera_imagen, segunda_imagen, primer_parametro);
     }
 
     cout << "Escribiendo imagen" << endl;
