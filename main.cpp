@@ -49,6 +49,12 @@ int main(int argc , char* argv[]){
         merge(primera_imagen, segunda_imagen, primer_parametro);
     } else if (filtro == "boxblur") {
         boxBlur(primera_imagen);
+    } else if (filtro == "sobel") {
+        blackWhite(primera_imagen);
+        for (int i = 0; i < 3; i++) {
+            boxBlur(primera_imagen);
+        }
+        sobel(primera_imagen);
     }
 
     cout << "Escribiendo imagen" << endl;

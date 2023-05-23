@@ -15,6 +15,7 @@ void boxBlur(PPM &imagen);
 void zoom(PPM &imagen, PPM &imagen_aumentada, int n);
 void edgeDetection(PPM &imagen, PPM &imagen_target);
 void plain(PPM &imagen, unsigned char c);
+void sobel(PPM &imagen);
 
 // FILTROS MULTI-THREAD
 

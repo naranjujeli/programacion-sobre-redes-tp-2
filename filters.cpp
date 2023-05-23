@@ -102,4 +102,59 @@ void boxBlur(PPM &imagen) {
     imagen = imagen_final;
 }
 
+void sobel(PPM &imagen) {
+    short int kernel_horizontal[3][3] = {
+        { 1, 2, 1 },
+        { 0, 0, 0 },
+        { -1, -2, -1 }
+    };
+    short int kernel_vertical[3][3] = {
+        { 1, 0, -1 },
+        { 2, 0, -2 },
+        { 1, 0, -1 }
+    };
+
+    PPM imagen_final(imagen.ancho, imagen.alto);
+    for (int fila = 1; fila < imagen.alto-1; fila++) {
+        for (int columna = 1; columna < imagen.ancho-1; columna++) {
+            // TODO crear una funcion para aplicar el kernel
+            int filtro_vertical[3] = { 0, 0, 0 }; // rojo, verde y azul
+            for (int i = -1; i < 1; i++) {
+                for (int j = -1; j < 1; j++) {
+                    filtro_vertical[0] += imagen.getPixel(fila+i, columna+j).rojo * kernel_vertical[i+1][j+1];
+                    filtro_vertical[1] += imagen.getPixel(fila+i, columna+j).verde * kernel_vertical[i+1][j+1];
+                    filtro_vertical[2] += imagen.getPixel(fila+i, columna+j).azul * kernel_vertical[i+1][j+1];
+                }
+            }
+            for (int i = 0; i < 3; i++) {
+                filtro_vertical[i] /= 9; // promedio
+            }
+
+            int filtro_horizontal[3] = { 0, 0, 0 };
+            for (int i = -1; i < 1; i++) {
+                for (int j = -1; j < 1; j++) {
+                    filtro_horizontal[0] += imagen.getPixel(fila+i, columna+j).rojo * kernel_horizontal[i+1][j+1];
+                    filtro_horizontal[1] += imagen.getPixel(fila+i, columna+j).verde * kernel_horizontal[i+1][j+1];
+                    filtro_horizontal[2] += imagen.getPixel(fila+i, columna+j).azul * kernel_horizontal[i+1][j+1];
+                }
+            }
+            for (int i = 0; i < 3; i++) {
+                filtro_horizontal[i] /= 9;
+            }
+
+            auto pitagoras = [filtro_vertical, filtro_horizontal] (int i) -> short int {
+                return static_cast<short int>(
+                    std::sqrt(
+                        std::pow(filtro_vertical[i], 2) + 
+                        std::pow(filtro_horizontal[i], 2)
+                    )
+                );
+            };
+
+            Pixel pixel_final(pitagoras(0), pitagoras(1), pitagoras(2));
+            imagen_final.setPixel(fila, columna, pixel_final.truncar());
+        }
+    }
+}
+
 #endif
