@@ -47,6 +47,8 @@ int main(int argc , char* argv[]){
         // TODO Verificar igual tamaño
         PPM segunda_imagen(argv[7]);
         merge(primera_imagen, segunda_imagen, primer_parametro);
+    } else if (filtro == "boxblur") {
+        boxBlur(primera_imagen);
     }
 
     cout << "Escribiendo imagen" << endl;

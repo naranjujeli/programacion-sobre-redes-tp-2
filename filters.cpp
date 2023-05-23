@@ -79,4 +79,27 @@ void merge(PPM &primera_imagen, PPM &segunda_imagen, float alfa_primera_imagen) 
     }
 }
 
+void boxBlur(PPM &imagen) {
+    PPM imagen_final(imagen.ancho, imagen.alto);
+    for (int fila = 1; fila < imagen.alto-1; fila++) {
+        for (int columna = 1; columna < imagen.ancho-1; columna++) {
+            int suma_valores[3] = { 0, 0, 0 };
+            for (int i = fila-1; i <= fila+1; i++) {
+                for (int j = columna-1; j <= columna+1; j++) {
+                    suma_valores[0] += imagen.getPixel(fila+i, columna+j).rojo;
+                    suma_valores[1] += imagen.getPixel(fila+i, columna+j).verde;
+                    suma_valores[2] += imagen.getPixel(fila+i, columna+j).azul;
+                }
+            }
+            int promedio_valores[3];
+            for (int i = 0; i < 3; i++) {
+                promedio_valores[i] = suma_valores[i] / 3;
+            }
+            Pixel pixel_blureado(promedio_valores[0], promedio_valores[1], promedio_valores[2]);
+            imagen_final.setPixel(fila, columna, pixel_blureado);
+        }
+    }
+    imagen = imagen_final;
+}
+
 #endif
