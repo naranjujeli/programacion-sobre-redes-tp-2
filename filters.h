@@ -13,10 +13,9 @@ void merge(PPM& primera_imagen, PPM& segunda_imagen, float alfa_primera_imagen);
 void frame(PPM& imagen, Pixel color, int x);
 void boxBlur(PPM &imagen);
 void zoom(PPM &imagen, PPM &imagen_aumentada, int n);
-void edgeDetection(PPM &imagen, PPM &imagen_target);
+void edgeDetection(PPM &imagen);
 void plain(PPM &imagen, unsigned char c);
-void sobel(PPM &imagen);
-
+void sharpen(PPM &imagen);
 // FILTROS MULTI-THREAD
 
 // Completar :)

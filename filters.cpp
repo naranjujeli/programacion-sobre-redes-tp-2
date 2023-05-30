@@ -102,7 +102,7 @@ void boxBlur(PPM &imagen) {
     imagen = imagen_final;
 }
 
-void sobel(PPM &imagen) {
+void edgeDetection(PPM &imagen) {
     short int kernel_horizontal[3][3] = {
         { 1, 2, 1 },
         { 0, 0, 0 },
@@ -118,43 +118,65 @@ void sobel(PPM &imagen) {
     for (int fila = 1; fila < imagen.alto-1; fila++) {
         for (int columna = 1; columna < imagen.ancho-1; columna++) {
             // TODO crear una funcion para aplicar el kernel
-            int filtro_vertical[3] = { 0, 0, 0 }; // rojo, verde y azul
-            for (int i = -1; i < 1; i++) {
-                for (int j = -1; j < 1; j++) {
-                    filtro_vertical[0] += imagen.getPixel(fila+i, columna+j).rojo * kernel_vertical[i+1][j+1];
-                    filtro_vertical[1] += imagen.getPixel(fila+i, columna+j).verde * kernel_vertical[i+1][j+1];
-                    filtro_vertical[2] += imagen.getPixel(fila+i, columna+j).azul * kernel_vertical[i+1][j+1];
+            int filtro_vertical;
+            for (int i = -1; i <= 1; i++) {
+                for (int j = -1; j <= 1; j++) {
+                    filtro_vertical += imagen.getPixel(fila+i, columna+j).rojo * kernel_vertical[i+1][j+1];
                 }
             }
-            for (int i = 0; i < 3; i++) {
-                filtro_vertical[i] /= 9; // promedio
-            }
 
-            int filtro_horizontal[3] = { 0, 0, 0 };
-            for (int i = -1; i < 1; i++) {
-                for (int j = -1; j < 1; j++) {
-                    filtro_horizontal[0] += imagen.getPixel(fila+i, columna+j).rojo * kernel_horizontal[i+1][j+1];
-                    filtro_horizontal[1] += imagen.getPixel(fila+i, columna+j).verde * kernel_horizontal[i+1][j+1];
-                    filtro_horizontal[2] += imagen.getPixel(fila+i, columna+j).azul * kernel_horizontal[i+1][j+1];
+            filtro_vertical /= 9;
+
+            int filtro_horizontal;
+            for (int i = -1; i <= 1; i++) {
+                for (int j = -1; j <= 1; j++) {
+                    filtro_horizontal += imagen.getPixel(fila+i, columna+j).rojo * kernel_horizontal[i+1][j+1];
                 }
             }
-            for (int i = 0; i < 3; i++) {
-                filtro_horizontal[i] /= 9;
-            }
 
-            auto pitagoras = [filtro_vertical, filtro_horizontal] (int i) -> short int {
-                return static_cast<short int>(
-                    std::sqrt(
-                        std::pow(filtro_vertical[i], 2) + 
-                        std::pow(filtro_horizontal[i], 2)
-                    )
-                );
-            };
+            filtro_horizontal /= 9;
 
-            Pixel pixel_final(pitagoras(0), pitagoras(1), pitagoras(2));
+            short int pitagoras = static_cast<short int>(std::sqrt(std::pow(filtro_vertical, 2) + std::pow(filtro_horizontal, 2)));
+
+            Pixel pixel_final(pitagoras, pitagoras, pitagoras);
             imagen_final.setPixel(fila, columna, pixel_final.truncar());
         }
     }
+    for (int fila = 1; fila < imagen.alto-1; fila++) {
+        for (int columna = 1; columna < imagen.ancho-1; columna++) {
+            imagen.setPixel(fila, columna, imagen_final.getPixel(fila, columna)); 
+        }
+    }
 }
+
+void sharpen(PPM &imagen) {
+    std::vector<std::vector<int>> kernel = {
+        { 0, -1, 0 },
+        { -1, 5, -1},
+        { 0, -1, 0 }
+    };
+    PPM imagen_final(imagen.ancho, imagen.alto);
+    for (int fila = 1; fila < imagen.alto-1; fila++) {
+        for (int columna = 1; columna < imagen.ancho-1; columna++) {
+            int filtro[] = { 0, 0, 0 };
+            for (int i = -1; i <= 1; i++) {
+                for (int j = -1; j <= 1; j++) {
+                    filtro[0] += imagen.getPixel(fila+i, columna+j).rojo * kernel[i+1][j+1];
+                    filtro[1] += imagen.getPixel(fila+i, columna+j).verde * kernel[i+1][j+1];
+                    filtro[2] += imagen.getPixel(fila+i, columna+j).azul * kernel[i+1][j+1];
+                }
+            }
+            Pixel pixel_final(filtro[0], filtro[1],filtro[2]);
+            imagen_final.setPixel(fila, columna, pixel_final.truncar());
+        }
+    }
+    for (int fila = 1; fila < imagen.alto-1; fila++) {
+        for (int columna = 1; columna < imagen.ancho-1; columna++) {
+            imagen.setPixel(fila, columna, imagen_final.getPixel(fila, columna)); 
+        }
+    }
+}
+
+
 
 #endif

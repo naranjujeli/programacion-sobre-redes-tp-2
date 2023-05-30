@@ -49,12 +49,14 @@ int main(int argc , char* argv[]){
         merge(primera_imagen, segunda_imagen, primer_parametro);
     } else if (filtro == "boxblur") {
         boxBlur(primera_imagen);
-    } else if (filtro == "sobel") {
+    } else if (filtro == "edgedetection") {
         blackWhite(primera_imagen);
         for (int i = 0; i < 3; i++) {
             boxBlur(primera_imagen);
         }
-        sobel(primera_imagen);
+        edgeDetection(primera_imagen);
+    } else if (filtro == "sharpen") {
+        sharpen(primera_imagen);
     }
 
     cout << "Escribiendo imagen" << endl;
