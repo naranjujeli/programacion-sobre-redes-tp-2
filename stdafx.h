@@ -12,5 +12,6 @@
 #include <sstream>
 #include <fstream>
 #include <unistd.h>
+#include <map>
 
 #endif
