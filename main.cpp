@@ -61,16 +61,16 @@ bool guardarParametros(
     std::string &ruta_salida,
     std::string &ruta_segunda_imagen
 ) {
-    [i, argc] (*parametros_se_acabaron) () -> bool { return i == argc };
     int i = 1;
+    auto parametros_se_acabaron = [i, argc] () -> bool { return i == argc; };
     if (parametros_se_acabaron()) {
         return false;
     }
-    while (!parametros_se_acabaron() && existeFiltro((std::string)argv[i]) {
+    while (!parametros_se_acabaron() && existeFiltro((std::string)argv[i])) {
         filtros_a_aplicar.push_back((std::string)argv[i]);
         i++;
     }
-    if (parametros_se_acabaron() || !cantidad_filtros) {
+    if (parametros_se_acabaron() || !filtros_a_aplicar.size()) {
         return false;
     }
     if (!esNumero((std::string)argv[i])) {
@@ -85,19 +85,19 @@ bool guardarParametros(
     for (std::string filtro : filtros_a_aplicar) {
         cantidad_parametros_necesarios += filtros_disponibles[filtro];
     }
-    while (!parametros_se_acabaron() && esNumero((std::string)argv[i]) {
-        parametros.push_back(atof(argv[i]));
+    while (!parametros_se_acabaron() && esNumero((std::string)argv[i])) {
+        parametros.push(atof(argv[i]));
         i++;
     }
     if (cantidad_parametros_necesarios > 0) {
         return false;
     }
-    if (parametros_se_acabaron() || !existeArchivo((std::string)argv[i]) {
+    if (parametros_se_acabaron() || !existeArchivo((std::string)argv[i])) {
         return false;
     }
     ruta_primera_imagen = argv[i];
     i++;
-    if (parametros_se_acabaron() || !existeArchivo((std::string)argv[i]) {
+    if (parametros_se_acabaron() || !existeArchivo((std::string)argv[i])) {
         return false;
     }
     ruta_salida = argv[i];
@@ -145,24 +145,30 @@ int main(int argc , char* argv[]) {
             std::string filtro_actual = filtros_a_aplicar.back();
             filtros_a_aplicar.pop_back();
             if (filtro_actual == "plain") {
-                plain(primera_imagen, (unsigned char)parametros.pop_back());
+                plain(primera_imagen, (unsigned char)parametros.back());
+		parametros.pop();
             } else if (filtro_actual == "blackwhite") {
                 blackWhite(primera_imagen);
             } else if (filtro_actual == "shades") {
                 // TODO Verificar el primer parámetro no es menor a 2
-                shades(primera_imagen, (unsigned char)parametros.pop_back());
+                shades(primera_imagen, (unsigned char)parametros.back());
+		parametros.pop();
             } else if (filtro_actual == "brightness") {
-                brightness(primera_imagen, parametros.pop_back());
+                brightness(primera_imagen, parametros.back());
+		parametros.pop();
             } else if (filtro_actual == "contrast") {
                 // TODO Limitar el contraste
-                contrast(primera_imagen, parametros.pop_back());
+                contrast(primera_imagen, parametros.back());
+		parametros.pop();
             } else if (filtro_actual == "merge") {
                 // TODO Limitar porcentaje
                 // TODO Verificar igual tamaño
                 PPM segunda_imagen(argv[7]);
-                merge(primera_imagen, segunda_imagen, parametros.pop_back());
+                merge(primera_imagen, segunda_imagen, parametros.back());
+		parametros.pop();
             } else if (filtro_actual == "boxblur") {
-                boxBlur(primera_imagen, parametros.pop_back());
+                boxBlur(primera_imagen, parametros.back());
+		parametros.pop();
             } else if (filtro_actual == "edgedetection") {
                 blackWhite(primera_imagen);
                 boxBlur(primera_imagen, 3);
