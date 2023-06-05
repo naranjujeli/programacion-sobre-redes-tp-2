@@ -79,24 +79,18 @@ void merge(PPM &primera_imagen, PPM &segunda_imagen, float alfa_primera_imagen) 
     }
 }
 
-void boxBlur(PPM &imagen) {
+void boxBlur(PPM &imagen, const float &intensidad) {
     PPM imagen_final(imagen.ancho, imagen.alto);
     for (int fila = 1; fila < imagen.alto-1; fila++) {
         for (int columna = 1; columna < imagen.ancho-1; columna++) {
-            int suma_valores[] = { 0, 0, 0 };
+            Pixel suma;
             for (int i = -1; i <= 1; i++) {
                 for (int j = -1; j <= 1; j++) {
-                    suma_valores[0] += imagen.getPixel(fila+i, columna+j).rojo;
-                    suma_valores[1] += imagen.getPixel(fila+i, columna+j).verde;
-                    suma_valores[2] += imagen.getPixel(fila+i, columna+j).azul;
+                    suma.sumarPixel(imagen.getPixel(fila+i, columna+j));
                 }
             }
-            int promedio_valores[3];
-            for (int i = 0; i < 3; i++) {
-                promedio_valores[i] = suma_valores[i] / 9;
-            }
-            Pixel pixel_blureado(promedio_valores[0], promedio_valores[1], promedio_valores[2]);
-            imagen_final.setPixel(fila, columna, pixel_blureado);
+            suma.multiplicar(intensidad);
+            imagen_final.setPixel(fila, columna, suma.truncar());
         }
     }
     imagen = imagen_final;
@@ -158,16 +152,14 @@ void sharpen(PPM &imagen) {
     PPM imagen_final(imagen.ancho, imagen.alto);
     for (int fila = 1; fila < imagen.alto-1; fila++) {
         for (int columna = 1; columna < imagen.ancho-1; columna++) {
-            int filtro[] = { 0, 0, 0 };
+            Pixel suma;
             for (int i = -1; i <= 1; i++) {
                 for (int j = -1; j <= 1; j++) {
-                    filtro[0] += imagen.getPixel(fila+i, columna+j).rojo * kernel[i+1][j+1];
-                    filtro[1] += imagen.getPixel(fila+i, columna+j).verde * kernel[i+1][j+1];
-                    filtro[2] += imagen.getPixel(fila+i, columna+j).azul * kernel[i+1][j+1];
+                    Pixel pixel_auxiliar = imagen.getPixel(fila+i, columna+j);
+                    suma.sumarPixel(pixel_auxiliar.multiplicar(kernel[i+1][j+1]));
                 }
             }
-            Pixel pixel_final(filtro[0], filtro[1],filtro[2]);
-            imagen_final.setPixel(fila, columna, pixel_final.truncar());
+            imagen_final.setPixel(fila, columna, suma.truncar());
         }
     }
     for (int fila = 1; fila < imagen.alto-1; fila++) {

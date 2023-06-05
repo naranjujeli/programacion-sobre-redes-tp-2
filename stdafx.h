@@ -13,5 +13,7 @@
 #include <fstream>
 #include <unistd.h>
 #include <map>
+#include <queue>
+#include <algorithm>
 
 #endif
