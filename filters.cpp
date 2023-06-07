@@ -9,6 +9,36 @@
 
 using namespace std;
 
+// void plain_multi(PPM& imagen, const unsigned char &intensidad){
+
+//     for(int i = 0; i < n_threads; i++){
+//         std::thread hilo([i]() {
+//             pl
+//         });
+//     }
+
+
+    
+// }
+
+// void plain_single_row(PPM% imagen, const unsigned char %intensidad, int idthread){
+    
+//     for(int fila = idthread; fila < imagen.alto; fila+= n_threads) {
+//         for(int columna = 0; columna < imagen.ancho; columna++) {
+//             imagen.setPixel(fila, columna, Pixel(intensidad,intensidad,intensidad));
+//         }
+//     }
+// }
+
+// void blackWhite_multi(PPM &imagen) {
+//     for (int fila = 0; fila < imagen.alto; fila++) {
+//         for (int columna = 0; columna < imagen.ancho; columna++) {
+//             short int promedio = imagen.getPixel(fila, columna).sumaCumulativa()/3;
+//             Pixel pixel_final(promedio, promedio, promedio);
+//             imagen.setPixel(fila, columna, pixel_final);
+//         }
+//     }
+// }
 void plain(PPM& imagen, const unsigned char &intensidad){
     for(int fila = 0; fila < imagen.alto; fila++) {
         for(int columna = 0; columna < imagen.ancho; columna++) {
@@ -43,7 +73,7 @@ void brightness(PPM &imagen, const float &intensidad) {
     for (int fila = 0; fila < imagen.alto; fila++) {
         for (int columna = 0; columna < imagen.ancho; columna++) {
             Pixel pixel_final = imagen.getPixel(fila, columna);
-            pixel_final.sumar(255.f*intensidad);
+            pixel_final.sumar(255.f * intensidad);
             imagen.setPixel(fila, columna, pixel_final.truncar());
         }
     }
@@ -86,10 +116,11 @@ void boxBlur(PPM &imagen, const float &intensidad) {
             Pixel suma;
             for (int i = -1; i <= 1; i++) {
                 for (int j = -1; j <= 1; j++) {
-                    suma.sumarPixel(imagen.getPixel(fila+i, columna+j));
+                    Pixel pixel_auxiliar = imagen.getPixel(fila+i, columna+j);
+                    suma.sumarPixel(pixel_auxiliar.multiplicar(intensidad));
                 }
             }
-            suma.multiplicar(intensidad);
+            //suma.multiplicar();
             imagen_final.setPixel(fila, columna, suma.truncar());
         }
     }

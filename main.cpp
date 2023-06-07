@@ -37,15 +37,22 @@ bool existeArchivo(const std::string &ruta) {
 // Verifica que el parámetro sea un número, ya sea entero o con fracción decimal
 bool esNumero(const std::string &palabra) { 
     bool coma = false;
+    bool signo_menos = false;
     for (auto caracter : palabra) {
-        if (caracter == ',' || caracter == '.') {
-            if (coma) {
+        if (!std::isdigit(caracter)) {
+            if (caracter == '-') {
+                if (signo_menos) {
+                    return false;
+                }
+                signo_menos = true;
+            } else if (caracter == ',' || caracter == '.') {
+                if (coma) {
+                    return false;
+                }
+                coma = true;
+            } else {
                 return false;
             }
-            coma = true;
-        }
-        if (!std::isdigit(caracter)) {
-            return false;
         }
     }
     return true;
@@ -64,16 +71,16 @@ bool guardarParametros(
     int i = 1;
     auto parametros_se_acabaron = [i, argc] () -> bool { return i == argc; };
     if (parametros_se_acabaron()) {
-        return false;
+	    return false;
     }
-    while (!parametros_se_acabaron() && existeFiltro((std::string)argv[i])) {
+    while (!parametros_se_acabaron() && existeFiltro(std::string(argv[i]))) {
         filtros_a_aplicar.push_back((std::string)argv[i]);
         i++;
     }
     if (parametros_se_acabaron() || !filtros_a_aplicar.size()) {
         return false;
     }
-    if (!esNumero((std::string)argv[i])) {
+    if (!esNumero(std::string(argv[i]))) {
         return false;
     }
     cantidad_threads = atoi(argv[i]);
@@ -85,25 +92,28 @@ bool guardarParametros(
     for (std::string filtro : filtros_a_aplicar) {
         cantidad_parametros_necesarios += filtros_disponibles[filtro];
     }
-    while (!parametros_se_acabaron() && esNumero((std::string)argv[i])) {
+    while (!parametros_se_acabaron() && esNumero(std::string(argv[i]))) {
         parametros.push(atof(argv[i]));
         i++;
+        cantidad_parametros_necesarios--;
     }
     if (cantidad_parametros_necesarios > 0) {
         return false;
     }
-    if (parametros_se_acabaron() || !existeArchivo((std::string)argv[i])) {
+    if (parametros_se_acabaron() || !existeArchivo(std::string(argv[i]))) {
         return false;
     }
     ruta_primera_imagen = argv[i];
     i++;
-    if (parametros_se_acabaron() || !existeArchivo((std::string)argv[i])) {
+    if (parametros_se_acabaron()) {
+        std::cout << "No hay salida" << std::endl;
         return false;
     }
     ruta_salida = argv[i];
     i++;
     if (std::find(filtros_a_aplicar.begin(), filtros_a_aplicar.end(), "merge") != filtros_a_aplicar.end()) {
         if (parametros_se_acabaron()) {
+            std::cout << "Error en el merge" << std::endl;
             return false;
         }
         ruta_segunda_imagen = argv[i];
@@ -140,35 +150,37 @@ int main(int argc , char* argv[]) {
 
     cout << "Aplicando filtros"<< endl;
 
-    if (cantidad_threads == 0) {
+    if (cantidad_threads == 1) {
         while (!filtros_a_aplicar.empty()) {
-            std::string filtro_actual = filtros_a_aplicar.back();
-            filtros_a_aplicar.pop_back();
+            std::string filtro_actual = filtros_a_aplicar.front();
+            filtros_a_aplicar.erase(filtros_a_aplicar.begin()); 
+            std::cout << "Aplicando el filtro: " << filtro_actual << std::endl;
+            std::cout << "Usando y borrando el parámetro: " << parametros.front() << std::endl;
             if (filtro_actual == "plain") {
-                plain(primera_imagen, (unsigned char)parametros.back());
-		parametros.pop();
+                plain(primera_imagen, (unsigned char)parametros.front());
+				parametros.pop();
             } else if (filtro_actual == "blackwhite") {
                 blackWhite(primera_imagen);
             } else if (filtro_actual == "shades") {
                 // TODO Verificar el primer parámetro no es menor a 2
-                shades(primera_imagen, (unsigned char)parametros.back());
-		parametros.pop();
+                shades(primera_imagen, (unsigned char)parametros.front());
+				parametros.pop();
             } else if (filtro_actual == "brightness") {
-                brightness(primera_imagen, parametros.back());
-		parametros.pop();
+                brightness(primera_imagen, parametros.front());
+				parametros.pop();
             } else if (filtro_actual == "contrast") {
                 // TODO Limitar el contraste
-                contrast(primera_imagen, parametros.back());
-		parametros.pop();
+                contrast(primera_imagen, parametros.front());
+				parametros.pop();
             } else if (filtro_actual == "merge") {
                 // TODO Limitar porcentaje
                 // TODO Verificar igual tamaño
-                PPM segunda_imagen(argv[7]);
-                merge(primera_imagen, segunda_imagen, parametros.back());
-		parametros.pop();
+                PPM segunda_imagen(ruta_segunda_imagen);
+                merge(primera_imagen, segunda_imagen, parametros.front());
+				parametros.pop();
             } else if (filtro_actual == "boxblur") {
-                boxBlur(primera_imagen, parametros.back());
-		parametros.pop();
+                boxBlur(primera_imagen, parametros.front());
+				parametros.pop();
             } else if (filtro_actual == "edgedetection") {
                 blackWhite(primera_imagen);
                 boxBlur(primera_imagen, 3);
