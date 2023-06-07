@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <string>
+#include <cstring>
 #include <stdlib.h>
 #include <math.h>
 #include <vector>
@@ -15,5 +16,7 @@
 #include <map>
 #include <queue>
 #include <algorithm>
+#include <sys/mman.h>
+#include <semaphore.h>
 
 #endif
