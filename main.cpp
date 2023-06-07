@@ -17,9 +17,6 @@ std::map<std::string, int> filtros_disponibles {
     { "sharpen", 0},
 };
 
-void aplicarFiltro(PPM &imagen, void (*filtro) ());
-void aplicarFiltroMT();
-
 void mostrarAyuda() {
     std::cout << "Ha ocurrido un error. Verifique que los parametros sean correctos." << std::endl;
     cout << "Uso: ./main <[filtro]> <cantidad de threads> <[parámetro de filtro]> <primera imagen> <salida> <segunda imagen>" << endl;
@@ -154,8 +151,6 @@ int main(int argc , char* argv[]) {
         while (!filtros_a_aplicar.empty()) {
             std::string filtro_actual = filtros_a_aplicar.front();
             filtros_a_aplicar.erase(filtros_a_aplicar.begin()); 
-            std::cout << "Aplicando el filtro: " << filtro_actual << std::endl;
-            std::cout << "Usando y borrando el parámetro: " << parametros.front() << std::endl;
             if (filtro_actual == "plain") {
                 plain(primera_imagen, (unsigned char)parametros.front());
 				parametros.pop();
@@ -190,6 +185,42 @@ int main(int argc , char* argv[]) {
             }
         }
     } else {
+        while (!filtros_a_aplicar.empty()) {
+            std::string filtro_actual = filtros_a_aplicar.front();
+            filtros_a_aplicar.erase(filtros_a_aplicar.begin()); 
+            if (filtro_actual == "plain") {
+                plain(primera_imagen, (unsigned char)parametros.front());
+				parametros.pop();
+            } else if (filtro_actual == "blackwhite") {
+                blackWhite(primera_imagen);
+            } else if (filtro_actual == "shades") {
+                // TODO Verificar el primer parámetro no es menor a 2
+                shades(primera_imagen, (unsigned char)parametros.front());
+				parametros.pop();
+            } else if (filtro_actual == "brightness") {
+                brightness(primera_imagen, parametros.front());
+				parametros.pop();
+            } else if (filtro_actual == "contrast") {
+                // TODO Limitar el contraste
+                contrast(primera_imagen, parametros.front());
+				parametros.pop();
+            } else if (filtro_actual == "merge") {
+                // TODO Limitar porcentaje
+                // TODO Verificar igual tamaño
+                PPM segunda_imagen(ruta_segunda_imagen);
+                merge(primera_imagen, segunda_imagen, parametros.front());
+				parametros.pop();
+            } else if (filtro_actual == "boxblur") {
+                boxBlur(primera_imagen, parametros.front());
+				parametros.pop();
+            } else if (filtro_actual == "edgedetection") {
+                blackWhite(primera_imagen);
+                boxBlur(primera_imagen, 3);
+                edgeDetection(primera_imagen);
+            } else if (filtro_actual == "sharpen") {
+                sharpen(primera_imagen);
+            }
+        }
     }
 
     cout << "Escribiendo imagen" << endl;
