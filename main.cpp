@@ -16,7 +16,7 @@ std::map<std::string, int> filtros_disponibles { // El número indica la cantida
     { "blackwhite", 0 },
     { "shades", 1 },
     { "brightness", 1 },
-    { "constrast", 1 },
+    { "contrast", 1 },
     { "merge", 1 },
     { "boxblur", 1 },
     { "edgedetection", 0 },
@@ -46,8 +46,8 @@ int main(int argc , char* argv[]) {
         return 1;
     }
 
-    PPM *primera_imagen;
-    PPM *segunda_imagen;
+    PPM *primera_imagen = NULL;
+    PPM *segunda_imagen = NULL;
 
     std::cout << "Aplicando filtros"<< std::endl;
 
@@ -117,7 +117,7 @@ int main(int argc , char* argv[]) {
                 // TODO Limitar porcentaje
                 // TODO Verificar igual tamaño
                 segunda_imagen = (PPM *) mmap(NULL, sizeof(PPM), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
-                *segunda_imagen = PPM(ruta_segunda_imagen);
+                segunda_imagen = new PPM(ruta_segunda_imagen);
                 mergeMT(primera_imagen, segunda_imagen, parametros.front(), cantidad_threads);
                 munmap(segunda_imagen, sizeof(PPM));
                 delete segunda_imagen;
@@ -136,12 +136,12 @@ int main(int argc , char* argv[]) {
         munmap(primera_imagen, sizeof(PPM));
     }
 
-    cout << "Escribiendo imagen" << endl;
+    std::cout << "Escribiendo imagen" << std::endl;
     primera_imagen->escribir_imagen(ruta_salida);
-        
-    cout << "Listo" << endl;
-
     delete primera_imagen;
+
+    std::cout << "Listo" << std::endl;
+
 
     return 0;
 }

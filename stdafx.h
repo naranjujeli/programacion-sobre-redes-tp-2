@@ -12,6 +12,7 @@
 #include <exception>
 #include <sstream>
 #include <fstream>
+#include <filesystem>
 #include <unistd.h>
 #include <map>
 #include <queue>
